@@ -3,7 +3,7 @@
 #
 general:
     artifacts:
-        - /home/ubuntu/ME-Squad-2-Android/app/build/outputs/apk/
+        - /home/ubuntu/AndroidCI/app/build/outputs/apk/
 
 machine:
     environment:
@@ -16,11 +16,13 @@ dependencies:
     pre:
     - mkdir "$ANDROID_HOME/licenses"
     - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-    - if [ ! -e /usr/local/android-sdk-linux/build-tools/26.0.1 ]; then echo y | android update sdk --all --no-ui --filter "build-tools-26.0.1"; fi;
+    - if [ ! -e /usr/local/android-sdk-linux/build-tools/26.0.2 ]; then echo y | android update sdk --all --no-ui --filter "build-tools-26.0.2"; fi;
     - if [ ! -e /usr/local/android-sdk-linux/platforms/android-26 ]; then echo y | android update sdk --all --no-ui --filter "android-26"; fi;
-    - if [ ! -e /usr/local/android-sdk-linux/extras/android/m2repository ]; then echo y | android update sdk --all --no-ui --filter "extra-android-m2repository"; fi;
+    - echo y | android update sdk --no-ui --all --filter "tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository";
+    - echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+    - chmod +x gradlew
     cache_directories:
-     - /usr/local/android-sdk-linux/build-tools/26.0.1
+     - /usr/local/android-sdk-linux/build-tools/26.0.2
      - /usr/local/android-sdk-linux/platforms/android-26
      - /usr/local/android-sdk-linux/extras/android/m2repository
 
@@ -28,7 +30,7 @@ test:
     override:
         - (./gradlew assemble):
             timeout: 360
-        - ./gradlew build -PdisablePreDex
+        #- ./gradlew build -PdisablePreDex
     post:
       - cp -r app/build/outputs $CIRCLE_ARTIFACTS
       #- chmod +x DeployArtifact.sh;./DeployArtifact.sh
